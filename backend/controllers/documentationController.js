@@ -149,6 +149,23 @@ const documentationController = {
             }
           );
           return response.data;
+              }
+            }
+          );
+
+          const contents = response.data;
+          const processedContents = await Promise.all(contents.map(async (item) => {
+            if (item.type === 'dir') {
+              const children = await fetchContents(item.path);
+              return {
+                ...item,
+                children
+              };
+            }
+            return item;
+          }));
+
+          return processedContents;
         } catch (error) {
           console.error('GitHub API Request Failed:', {
             url: `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,

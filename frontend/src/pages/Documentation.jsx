@@ -9,8 +9,8 @@ import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import '../styles/documentation.css';
 import { FileText, Users, GitBranch, Download, Edit2, Save, RefreshCw } from 'lucide-react';
+import { API_CONFIG } from '../config/config';
 
-const API_BASE_URL = 'http://localhost:5000';
 
 const Documentation = () => {
   const [repoUrl, setRepoUrl] = useState('');
@@ -56,7 +56,7 @@ const Documentation = () => {
         throw new Error('Invalid GitHub repository URL format. Please use: https://github.com/owner/repo');
       }
 
-      const response = await axios.post(`${API_BASE_URL}/api/documentation/fetch-repo`, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/documentation/fetch-repo`, {
         repoUrl: cleanUrl
       });
 
@@ -94,7 +94,7 @@ const Documentation = () => {
       setLoading(true);
       const { owner, repo } = extractRepoInfo(repoUrl);
       
-      const response = await axios.post(`${API_BASE_URL}/api/documentation/fetch-file`, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/documentation/fetch-file`, {
         owner,
         repo,
         path: file.path
@@ -140,7 +140,7 @@ const Documentation = () => {
         selectedFiles.includes(file.path)
       );
 
-      const response = await axios.post(`${API_BASE_URL}/api/documentation/generate`, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/documentation/generate`, {
         repoUrl,
         files: selectedFileData
       }, {

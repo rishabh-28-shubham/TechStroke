@@ -22,6 +22,9 @@ const envVariableRoutes = require('./routes/envVariableRoutes');
 const docRoutes = require('./routes/documentationRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 
+const diagramRoutes = require('./routes/diagramRoutes');
+
+
 
 const path = require('path');
 const http = require('http');
@@ -49,6 +52,7 @@ app.use('/api/snippets', snippetRoutes);
 app.use('/api/env', envVariableRoutes);
 app.use('/api/documentation', docRoutes);
 app.use('/api/ai' , aiRoutes);
+app.use('/api/diagram', diagramRoutes);
 
 
 // Socket.io for real-time collaboration
