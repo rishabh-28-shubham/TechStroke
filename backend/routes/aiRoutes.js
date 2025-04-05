@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { analyzeCode } = require('../services/aiService');
+const { analyzeCode } = require('../services/aiService.js');
 
 
 router.post('/review' , async (req , res) => {
