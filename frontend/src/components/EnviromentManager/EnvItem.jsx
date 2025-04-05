@@ -13,7 +13,7 @@ const EnvItem = ({ env, updateEnvVariable, deleteEnvVariable }) => {
   const handleEdit = async () => {
     try {
       const response = await axios.put(
-        `${API_CONFIG.BASE_URL}/api/env/${env._id}`,
+        ${API_CONFIG.BASE_URL}/api/env/${env._id},
         { value: newValue }
       );
       updateEnvVariable(response.data);
@@ -25,7 +25,7 @@ const EnvItem = ({ env, updateEnvVariable, deleteEnvVariable }) => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API_CONFIG.BASE_URL}/api/env/${name}`);
+      await axios.delete(${API_CONFIG.BASE_URL}/api/env/${name});
       deleteEnvVariable(_id);
     } catch (error) {
       console.error('Error deleting environment variable:', error);

@@ -5,6 +5,7 @@ import EnvForm from '../components/EnviromentManager/EnvForm';
 import { Database } from 'lucide-react';
 import { API_CONFIG } from '../config/config';
 
+
 const EnvManager = () => {
   const [envVariables, setEnvVariables] = useState([]);
 
