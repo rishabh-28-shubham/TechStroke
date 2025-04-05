@@ -17,7 +17,7 @@ const EnvForm = ({ addEnvVariable }) => {
     }
 
     try {
-      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/env`, { name, value });
+      const response = await axios.post(${API_CONFIG.BASE_URL}/api/env, { name, value });
       addEnvVariable(response.data);
       setName('');
       setValue('');

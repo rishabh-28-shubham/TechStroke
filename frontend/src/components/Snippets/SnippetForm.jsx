@@ -18,7 +18,7 @@ const SnippetForm = ({ onSnippetAdded }) => {
     }
 
     try {
-      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/snippets`, {
+      const response = await axios.post(${API_CONFIG.BASE_URL}/api/snippets, {
         title,
         description,
         code,
