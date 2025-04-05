@@ -3,8 +3,7 @@ import axios from 'axios';
 import EnvList from '../components/EnviromentManager/EnvList';
 import EnvForm from '../components/EnviromentManager/EnvForm';
 import { Database } from 'lucide-react';
-
-const API_BASE_URL = 'http://localhost:5000'
+import { API_CONFIG } from '../config/config';
 
 const EnvManager = () => {
   const [envVariables, setEnvVariables] = useState([]);
@@ -12,7 +11,7 @@ const EnvManager = () => {
   // Fetch environment variables from the backend
   const fetchEnvVariables = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/env`);
+      const response = await axios.get(`${API_CONFIG.BASE_URL}/api/env`);
       setEnvVariables(response.data);
     } catch (error) {
       console.error('Error fetching environment variables:', error);

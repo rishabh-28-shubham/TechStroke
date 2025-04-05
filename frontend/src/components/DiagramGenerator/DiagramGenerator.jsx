@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import mermaid from 'mermaid';
 import FileExplorer from '../Documentation/FileExplorer';
-
-const API_BASE_URL = 'http://localhost:5000';
+import { API_CONFIG } from '../../config/config';
 
 const DiagramGenerator = () => {
   const [repoUrl, setRepoUrl] = useState('');
@@ -40,7 +39,7 @@ const DiagramGenerator = () => {
         throw new Error('Invalid GitHub repository URL format. Please use: https://github.com/owner/repo');
       }
 
-      const response = await axios.post(`${API_BASE_URL}/api/documentation/fetch-repo`, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/documentation/fetch-repo`, {
         repoUrl: cleanUrl
       });
 
@@ -70,7 +69,7 @@ const DiagramGenerator = () => {
       setExpandingFolder(true);
       const { owner, repo } = extractRepoInfo(repoUrl);
       
-      const response = await axios.post(`${API_BASE_URL}/api/documentation/fetch-file`, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/documentation/fetch-file`, {
         owner,
         repo,
         path: file.path
@@ -125,7 +124,7 @@ const DiagramGenerator = () => {
       );
 
       // Generate diagram directly from the files
-      const diagramResponse = await axios.post(`${API_BASE_URL}/api/diagram/generate`, {
+      const diagramResponse = await axios.post(`${API_CONFIG.BASE_URL}/api/diagram/generate`, {
         files: selectedFileData,
         diagramType
       });
