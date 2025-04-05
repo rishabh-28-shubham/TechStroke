@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Plus } from 'lucide-react';
-
-const API_BASE_URL = 'http://localhost:5000';
+import { API_CONFIG } from '../../config/config';
 
 const SnippetForm = ({ onSnippetAdded }) => {
   const [title, setTitle] = useState('');
@@ -19,7 +18,7 @@ const SnippetForm = ({ onSnippetAdded }) => {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/snippets`, {
+      const response = await axios.post(${API_CONFIG.BASE_URL}/api/snippets, {
         title,
         description,
         code,
