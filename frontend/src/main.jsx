@@ -10,6 +10,7 @@ import ApiTester from './pages/ApiTester.jsx'
 import EnvManager from './pages/EnvManager.jsx'
 import Documentation from './pages/Documentation.jsx'
 import CodeCollab from './pages/CodeCollab.jsx'
+import Diagram from './pages/Diagram.jsx'
 import React from 'react'
 
 
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
         path: 'codecollab',
         element: <CodeCollab />,
       },
+      {
+        path:'diagram',
+        element:<Diagram/>
+      }
     ],
   },
 ]);

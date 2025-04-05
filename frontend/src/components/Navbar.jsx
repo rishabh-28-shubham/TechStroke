@@ -20,6 +20,7 @@ const Navbar = () => {
               <NavItem to="/env-manager" icon={<Database className="h-5 w-5" />} text="Env Manager" />
               <NavItem to="/documentation" icon={<FileText className="h-5 w-5" />} text="Docs" />
               <NavItem to="/codecollab" icon={<Box className="h-5 w-5" />} text="Code Collab" />
+              <NavItem to="/diagram" icon={<Box className="h-5 w-5" />} text="Diagram" /> 
             </div>
           </div>
         </div>
