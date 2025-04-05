@@ -1,12 +1,12 @@
 import {useState } from 'react';
 import axios from 'axios';
 import React from 'react';
+import { Plus } from 'lucide-react';
+import { API_CONFIG } from '../../config/config';
 
 const EnvForm = ({ addEnvVariable }) => {
   const [name, setName] = useState('');
   const [value, setValue] = useState('');
-
-  const API_BASE_URL = 'http://localhost:5000'
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,8 +17,8 @@ const EnvForm = ({ addEnvVariable }) => {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/env`, { name, value });
-      addEnvVariable(response.data); // Add new env variable to the state in the parent
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/env`, { name, value });
+      addEnvVariable(response.data);
       setName('');
       setValue('');
     } catch (error) {
@@ -27,30 +27,40 @@ const EnvForm = ({ addEnvVariable }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
-      <div className="mb-4">
-        <label className="block text-gray-700">Name</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md"
-          placeholder="Enter environment variable name"
-        />
+    <form onSubmit={handleSubmit} className="p-6">
+      <h2 className="text-xl font-semibold text-[#6366F1] mb-6 flex items-center gap-2">
+        <Plus className="h-5 w-5" />
+        Add New Variable
+      </h2>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6366F1] focus:border-transparent outline-none transition-all"
+            placeholder="Enter variable name"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Value</label>
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6366F1] focus:border-transparent outline-none transition-all"
+            placeholder="Enter value"
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-[#6366F1] text-white px-4 py-2 rounded-lg hover:bg-[#5355E8] transition-colors duration-200 flex items-center justify-center gap-2"
+        >
+          <Plus className="h-5 w-5" />
+          Add Variable
+        </button>
       </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">Value</label>
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md"
-          placeholder="Enter value"
-        />
-      </div>
-      <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-md">
-        Save
-      </button>
     </form>
   );
 };

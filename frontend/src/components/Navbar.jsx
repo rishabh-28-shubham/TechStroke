@@ -10,7 +10,7 @@ const Navbar = () => {
           <div className="flex items-center space-x-8">
             <Link to="/" className="flex items-center space-x-2">
               <Code2 className="h-8 w-8 text-indigo-600" />
-              <span className="text-xl font-bold text-gray-900">makeDEVEZY</span>
+              <span className="text-xl font-bold text-gray-900">TechStroke</span>
             </Link>
             
             <div className="hidden md:flex space-x-4">
@@ -20,6 +20,7 @@ const Navbar = () => {
               <NavItem to="/env-manager" icon={<Database className="h-5 w-5" />} text="Env Manager" />
               <NavItem to="/documentation" icon={<FileText className="h-5 w-5" />} text="Docs" />
               <NavItem to="/codecollab" icon={<Box className="h-5 w-5" />} text="Code Collab" />
+              <NavItem to="/diagram" icon={<Box className="h-5 w-5" />} text="Diagram" /> 
             </div>
           </div>
         </div>
