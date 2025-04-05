@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { io } from 'socket.io-client';
+import socket from '../Context/SocketContext';
 import FileExplorer from '../components/Documentation/FileExplorer';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -8,9 +8,8 @@ import rehypeRaw from 'rehype-raw';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import '../styles/documentation.css';
-
-const API_BASE_URL = 'http://localhost:5000';
-const socket = io(API_BASE_URL);
+import { FileText, Users, GitBranch, Download, Edit2, Save, RefreshCw } from 'lucide-react';
+import { API_CONFIG } from '../config/config';
 
 const Documentation = () => {
   const [repoUrl, setRepoUrl] = useState('');
@@ -56,7 +55,7 @@ const Documentation = () => {
         throw new Error('Invalid GitHub repository URL format. Please use: https://github.com/owner/repo');
       }
 
-      const response = await axios.post(`${API_BASE_URL}/api/documentation/fetch-repo`, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/documentation/fetch-repo`, {
         repoUrl: cleanUrl
       });
 
@@ -94,7 +93,7 @@ const Documentation = () => {
       setLoading(true);
       const { owner, repo } = extractRepoInfo(repoUrl);
       
-      const response = await axios.post(`${API_BASE_URL}/api/documentation/fetch-file`, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/documentation/fetch-file`, {
         owner,
         repo,
         path: file.path
@@ -140,7 +139,7 @@ const Documentation = () => {
         selectedFiles.includes(file.path)
       );
 
-      const response = await axios.post(`${API_BASE_URL}/api/documentation/generate`, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/documentation/generate`, {
         repoUrl,
         files: selectedFileData
       }, {
@@ -295,133 +294,198 @@ const Documentation = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="p-4">
-        <div className="mb-4 flex gap-4 items-center bg-white p-4 rounded shadow">
-          <input
-            type="text"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            placeholder="Enter your name"
-            className="p-2 border rounded"
-          />
-          <input
-            type="text"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-            placeholder="Enter room ID"
-            className="p-2 border rounded"
-          />
-          <button
-            onClick={joinCollaboration}
-            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
-            disabled={!userName || !roomId}
-          >
-            Join Collaboration
-          </button>
-          {isConnected && (
-            <span className="text-green-500">Connected</span>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold text-[#6366F1] flex items-center justify-center gap-2">
+            <FileText className="h-8 w-8" />
+            Documentation Generator
+          </h1>
+          <p className="text-gray-600">Generate comprehensive documentation from your codebase</p>
+        </div>
+
+        {/* Collaboration Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-6 space-y-4">
+          <div className="flex items-center gap-2 text-[#6366F1] text-xl font-semibold mb-4">
+            <Users className="h-5 w-5" />
+            <h2>Collaboration</h2>
+          </div>
+          <div className="flex flex-wrap gap-4 items-center">
+            <input
+              type="text"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              placeholder="Enter your name"
+              className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6366F1] focus:border-transparent outline-none transition-all"
+            />
+            <input
+              type="text"
+              value={roomId}
+              onChange={(e) => setRoomId(e.target.value)}
+              placeholder="Enter room ID"
+              className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6366F1] focus:border-transparent outline-none transition-all"
+            />
+            <button
+              onClick={joinCollaboration}
+              className="px-6 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5355E8] transition-colors duration-200 flex items-center gap-2 disabled:opacity-50"
+              disabled={!userName || !roomId}
+            >
+              <Users className="h-4 w-4" />
+              Join Collaboration
+            </button>
+            {isConnected && (
+              <span className="text-green-500 flex items-center gap-2">
+                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                Connected
+              </span>
+            )}
+          </div>
+
+          {collaborators.length > 0 && (
+            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-700">
+                <Users className="h-4 w-4" />
+                <span className="font-medium">Active Collaborators:</span>
+                {collaborators.join(', ')}
+              </div>
+            </div>
+          )}
+
+          {typingUser && (
+            <div className="text-gray-600 italic flex items-center gap-2">
+              <div className="animate-pulse">
+                <Edit2 className="h-4 w-4" />
+              </div>
+              {typingUser} is typing...
+            </div>
           )}
         </div>
 
-        {collaborators.length > 0 && (
-          <div className="mb-4 p-2 bg-gray-100 rounded">
-            <span className="font-semibold">Collaborators: </span>
-            {collaborators.join(', ')}
+        {/* Repository Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-6 space-y-4">
+          <div className="flex items-center gap-2 text-[#6366F1] text-xl font-semibold mb-4">
+            <GitBranch className="h-5 w-5" />
+            <h2>Repository</h2>
           </div>
-        )}
-
-        {typingUser && (
-          <div className="mb-4 text-gray-600 italic">
-            {typingUser} is typing...
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
+              placeholder="Enter GitHub repository URL (e.g., https://github.com/owner/repo)"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6366F1] focus:border-transparent outline-none transition-all"
+            />
+            <button
+              onClick={fetchRepository}
+              className="px-6 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5355E8] transition-colors duration-200 flex items-center gap-2 disabled:opacity-50"
+              disabled={loading || !repoUrl.trim()}
+            >
+              {loading ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Fetching...
+                </>
+              ) : (
+                <>
+                  <GitBranch className="h-4 w-4" />
+                  Fetch Repository
+                </>
+              )}
+            </button>
+            
+            {error && (
+              <div className="p-4 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-center gap-2">
+                <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                {error}
+              </div>
+            )}
           </div>
-        )}
-
-        <div className="mb-4">
-          <input
-            type="text"
-            value={repoUrl}
-            onChange={(e) => setRepoUrl(e.target.value)}
-            placeholder="Enter GitHub repository URL (e.g., https://github.com/owner/repo)"
-            className="w-full p-2 border rounded"
-          />
-          <button
-            onClick={fetchRepository}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
-            disabled={loading || !repoUrl.trim()}
-          >
-            {loading ? 'Fetching...' : 'Fetch Repository'}
-          </button>
-          
-          {error && (
-            <div className="mt-2 p-2 bg-red-100 text-red-700 rounded">
-              {error}
-            </div>
-          )}
         </div>
 
         {files.length > 0 && (
-          <div className="flex gap-4">
-            <div className="w-[30%] relative">
-              {expandingFolder && (
-                <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                </div>
-              )}
-              <FileExplorer 
-                files={files}
-                onFileSelect={handleFileSelect}
-                selectedFiles={selectedFiles}
-                onFileContent={fetchFileContent}
-              />
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative">
+                {expandingFolder && (
+                  <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10 rounded-lg">
+                    <RefreshCw className="h-8 w-8 text-[#6366F1] animate-spin" />
+                  </div>
+                )}
+                <FileExplorer 
+                  files={files}
+                  onFileSelect={handleFileSelect}
+                  selectedFiles={selectedFiles}
+                  onFileContent={fetchFileContent}
+                />
+              </div>
             </div>
 
-            <div className="w-[70%]">
-              <div className="bg-white p-4 rounded shadow mb-4">
-                <div className="flex justify-between mb-4">
+            <div className="lg:col-span-3">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-6 space-y-6">
+                <div className="flex flex-wrap gap-4 justify-between">
                   <button
                     onClick={generateDocumentation}
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-green-300"
+                    className="px-6 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5355E8] transition-colors duration-200 flex items-center gap-2 disabled:opacity-50"
                     disabled={loading || selectedFiles.length === 0}
                   >
-                    {loading ? 'Generating...' : `Generate Documentation (${selectedFiles.length} files selected)`}
+                    {loading ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="h-4 w-4" />
+                        Generate Documentation ({selectedFiles.length} files)
+                      </>
+                    )}
                   </button>
                   {documentation && (
                     <button
                       onClick={downloadDocumentation}
-                      className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+                      className="px-6 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5355E8] transition-colors duration-200 flex items-center gap-2"
                     >
+                      <Download className="h-4 w-4" />
                       Download Documentation
                     </button>
                   )}
                 </div>
 
                 {fileContent && (
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold mb-2">File Preview: {fileContent.path}</h3>
-                    <pre className="bg-gray-100 p-4 rounded overflow-x-auto">
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-[#6366F1]" />
+                      File Preview: {fileContent.path}
+                    </h3>
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
                       <code>{fileContent.content}</code>
                     </pre>
                   </div>
                 )}
 
                 {loading && (
-                  <div className="flex items-center justify-center p-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                  <div className="flex items-center justify-center p-8">
+                    <RefreshCw className="h-8 w-8 text-[#6366F1] animate-spin" />
                   </div>
                 )}
                 
                 {documentation && (
-                  <div className="prose prose-lg max-w-none dark:prose-invert bg-white p-6 rounded-lg shadow-lg">
+                  <div className="prose prose-lg max-w-none dark:prose-invert rounded-lg">
                     <div className="flex justify-end mb-4">
                       <button
                         onClick={toggleEditMode}
-                        className={`px-4 py-2 rounded ${
-                          isEditing 
-                            ? 'bg-green-500 hover:bg-green-600' 
-                            : 'bg-blue-500 hover:bg-blue-600'
-                        } text-white`}
+                        className="px-6 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5355E8] transition-colors duration-200 flex items-center gap-2"
                       >
-                        {isEditing ? 'Save Changes' : 'Edit Documentation'}
+                        {isEditing ? (
+                          <>
+                            <Save className="h-4 w-4" />
+                            Save Changes
+                          </>
+                        ) : (
+                          <>
+                            <Edit2 className="h-4 w-4" />
+                            Edit Documentation
+                          </>
+                        )}
                       </button>
                     </div>
 
@@ -429,7 +493,7 @@ const Documentation = () => {
                       <textarea
                         value={editableContent}
                         onChange={handleContentChange}
-                        className="w-full h-[600px] p-4 font-mono text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full h-[600px] p-4 font-mono text-sm border rounded-lg focus:ring-2 focus:ring-[#6366F1] focus:border-transparent"
                         style={{ 
                           resize: 'vertical',
                           minHeight: '300px',

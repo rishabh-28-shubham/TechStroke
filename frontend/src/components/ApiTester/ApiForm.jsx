@@ -73,7 +73,7 @@ const ApiForm = ({ onSendRequest }) => {
 
       <button
         type="submit"
-        className="w-full bg-indigo-600 text-white p-2 rounded-md mt-4 hover:bg-indigo-700 transition duration-300"
+        className="w-full bg-[#6366F1] text-white px-4 py-2 rounded-lg hover:bg-[#5355E8] transition-colors duration-200 flex items-center justify-center gap-2"
       >
         Send Request
       </button>
