@@ -3,8 +3,7 @@ import axios from 'axios';
 import SnippetItem from './SnippetItem';
 import SnippetForm from './SnippetForm';
 import { Plus, Code2 } from 'lucide-react';
-
-const API_BASE_URL = 'http://localhost:5000';
+import { API_CONFIG } from '../../config/config';
 
 const SnippetList = () => {
   const [snippets, setSnippets] = useState([]);
@@ -16,7 +15,7 @@ const SnippetList = () => {
 
   const fetchSnippets = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/snippets`);
+      const response = await axios.get(${API_CONFIG.BASE_URL}/api/snippets);
       setSnippets(response.data);
     } catch (error) {
       console.error('Error fetching snippets:', error);
@@ -25,7 +24,7 @@ const SnippetList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/snippets/${id}`);
+      await axios.delete(${API_CONFIG.BASE_URL}/api/snippets/${id});
       setSnippets(snippets.filter(snippet => snippet._id !== id));
     } catch (error) {
       console.error('Error deleting snippet:', error);
