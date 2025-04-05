@@ -5,6 +5,7 @@ import SnippetForm from './SnippetForm';
 import { Plus, Code2 } from 'lucide-react';
 import { API_CONFIG } from '../../config/config';
 
+
 const SnippetList = () => {
   const [snippets, setSnippets] = useState([]);
   const [showForm, setShowForm] = useState(false);
