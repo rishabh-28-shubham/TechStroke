@@ -143,8 +143,7 @@ const documentationController = {
             `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
             {
               headers: {
-                'Accept': 'application/vnd.github.v3+json',
-                'Authorization': `token ${process.env.GITHUB_TOKEN}`
+                'Accept': 'application/vnd.github.v3+json'
               }
             }
           );
@@ -281,8 +280,7 @@ const documentationController = {
         `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
         {
           headers: {
-            'Accept': 'application/vnd.github.v3+json',
-            'Authorization': `token ${process.env.GITHUB_TOKEN}`
+            'Accept': 'application/vnd.github.v3+json'
           }
         }
       );

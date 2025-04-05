@@ -8,7 +8,7 @@ const connectDB = require('./config/db');
 dotenv.config();
 
 // Validate required environment variables
-const requiredEnvVars = ['GITHUB_TOKEN', 'GEMINI_API_KEY', 'MONGO_URI'];
+const requiredEnvVars = ['GEMINI_API_KEY', 'MONGO_URI'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
