@@ -10,12 +10,11 @@ import ApiTester from './pages/ApiTester.jsx'
 import EnvManager from './pages/EnvManager.jsx'
 import Documentation from './pages/Documentation.jsx'
 import CodeCollab from './pages/CodeCollab.jsx'
-<<<<<<< HEAD
+
 import Diagram from './pages/Diagram.jsx'
 import React from 'react'
 
-=======
->>>>>>> 0dde4d6937fefcb1f2d1c076e32f5db83a6038f0
+
 
 const router = createBrowserRouter([
   {
