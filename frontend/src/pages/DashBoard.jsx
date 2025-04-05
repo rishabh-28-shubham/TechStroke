@@ -5,24 +5,11 @@ import { Link } from "react-router-dom"
 import { Code2, Zap, Database, FileText, Box, ArrowRight, Github, Twitter } from "lucide-react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { useGLTF, Float, PresentationControls, Environment, ContactShadows } from "@react-three/drei"
 import { useInView } from "react-intersection-observer"
 
 // Register ScrollTrigger with GSAP
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger)
-}
-
-// 3D Model Component
-function Model(props) {
-  const { scene } = useGLTF("/placeholder.svg?height=500&width=500")
-
-  useFrame((state) => {
-    scene.rotation.y = state.clock.getElapsedTime() * 0.15
-  })
-
-  return <primitive object={scene} {...props} />
 }
 
 // Animated Feature Card
@@ -72,8 +59,8 @@ function FeatureCard({ to, icon, title, description, delay = 0 }) {
   )
 }
 
-// Animated Section
-function AnimatedSection({ children, className }) {
+// Animated Section with Parallax
+function AnimatedSection({ children, className, parallax = false }) {
   const sectionRef = useRef(null)
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -82,107 +69,121 @@ function AnimatedSection({ children, className }) {
 
   useEffect(() => {
     if (inView && sectionRef.current) {
-      gsap.fromTo(sectionRef.current, { y: 100, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: "power3.out" })
+      if (parallax) {
+        gsap.to(sectionRef.current, {
+          y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        })
+      } else {
+        gsap.fromTo(
+          sectionRef.current,
+          { y: 100, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
+        )
+      }
     }
-  }, [inView])
+  }, [inView, parallax])
 
   return (
     <div ref={ref} className={className}>
-      <div ref={sectionRef}>{children}</div>
+      <div ref={sectionRef} data-speed={parallax ? "0.1" : undefined}>{children}</div>
     </div>
   )
 }
 
-// Floating 3D Objects
-function FloatingObjects() {
+// Floating Background Elements with Parallax
+function FloatingBackground() {
+  const elementsRef = useRef([])
+
+  useEffect(() => {
+    elementsRef.current.forEach((element, index) => {
+      gsap.to(element, {
+        y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
+        ease: "none",
+        scrollTrigger: {
+          trigger: element,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      })
+    })
+  }, [])
+
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      <Canvas 
-        className="w-full h-full" 
-        camera={{ position: [0, 0, 15], fov: 60 }}
-        gl={{ antialias: true, alpha: true }}
-      >
-        <color attach="background" args={['transparent']} />
-        <ambientLight intensity={1} />
-        <directionalLight position={[10, 10, 5]} intensity={1} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} />
-        
-        <PresentationControls
-          global
-          config={{ mass: 1, tension: 300 }}
-          snap={{ mass: 2, tension: 800 }}
-          rotation={[0, 0, 0]}
-          polar={[-Math.PI / 3, Math.PI / 3]}
-          azimuth={[-Math.PI / 1.4, Math.PI / 2]}
-        >
-          <group>
-            <Float rotationIntensity={0.2} speed={1}>
-              <mesh position={[-4, 2, -5]} scale={0.5}>
-                <torusKnotGeometry args={[1, 0.3, 128, 32]} />
-                <meshPhongMaterial color="#6366f1" shininess={100} />
-              </mesh>
-            </Float>
-            <Float rotationIntensity={0.2} speed={1}>
-              <mesh position={[5, -2, -2]} scale={0.6}>
-                <icosahedronGeometry args={[2, 1]} />
-                <meshPhongMaterial color="#8b5cf6" shininess={100} />
-              </mesh>
-            </Float>
-            <Float rotationIntensity={0.2} speed={1}>
-              <mesh position={[-5, -3, -1]} scale={0.4}>
-                <dodecahedronGeometry args={[2, 1]} />
-                <meshPhongMaterial color="#ec4899" shininess={100} />
-              </mesh>
-            </Float>
-            <Float rotationIntensity={0.2} speed={1}>
-              <mesh position={[3, 3, -3]} scale={0.3}>
-                <octahedronGeometry args={[2, 0]} />
-                <meshPhongMaterial color="#10b981" shininess={100} />
-              </mesh>
-            </Float>
-          </group>
-        </PresentationControls>
-        
-        <Environment preset="sunset" />
-      </Canvas>
+      <div
+        ref={el => elementsRef.current[0] = el}
+        className="absolute top-20 left-20 w-64 h-64 bg-indigo-100 rounded-full opacity-20 animate-bounce-slow"
+        data-speed="0.1"
+      ></div>
+      <div
+        ref={el => elementsRef.current[1] = el}
+        className="absolute top-40 right-40 w-48 h-48 bg-purple-100 rounded-full opacity-20 animate-bounce-slow animation-delay-1000"
+        data-speed="0.15"
+      ></div>
+      <div
+        ref={el => elementsRef.current[2] = el}
+        className="absolute bottom-20 left-1/4 w-80 h-80 bg-pink-100 rounded-full opacity-20 animate-bounce-slow"
+        data-speed="0.2"
+      ></div>
+      <div
+        ref={el => elementsRef.current[3] = el}
+        className="absolute bottom-40 right-20 w-56 h-56 bg-blue-100 rounded-full opacity-20 animate-bounce-slow animation-delay-1000"
+        data-speed="0.25"
+      ></div>
     </div>
-  );
+  )
 }
 
-// Hero 3D Scene
-function HeroScene() {
+// Hero Background with Parallax
+function HeroBackground() {
+  const elementsRef = useRef([])
+
+  useEffect(() => {
+    elementsRef.current.forEach((element, index) => {
+      gsap.to(element, {
+        y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
+        scale: (i, target) => 1 + (ScrollTrigger.maxScroll(window) * target.dataset.scale),
+        ease: "none",
+        scrollTrigger: {
+          trigger: element,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      })
+    })
+  }, [])
+
   return (
     <div className="absolute inset-0 pointer-events-none">
-      <Canvas 
-        camera={{ position: [0, 0, 10], fov: 50 }}
-        gl={{ antialias: true, alpha: true }}
-      >
-        <color attach="background" args={['transparent']} />
-        <ambientLight intensity={1} />
-        <directionalLight position={[10, 10, 5]} intensity={1} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        
-        <PresentationControls
-          global
-          config={{ mass: 1, tension: 300 }}
-          snap={{ mass: 2, tension: 800 }}
-          rotation={[0, 0, 0]}
-          polar={[-Math.PI / 3, Math.PI / 3]}
-          azimuth={[-Math.PI / 1.4, Math.PI / 2]}
-        >
-          <Float rotationIntensity={0.1} speed={1}>
-            <mesh position={[0, 0, 0]} scale={2.5}>
-              <torusKnotGeometry args={[1, 0.3, 128, 32]} />
-              <meshPhongMaterial color="#4f46e5" shininess={100} />
-            </mesh>
-          </Float>
-        </PresentationControls>
-        
-        <ContactShadows position={[0, -3.5, 0]} opacity={0.4} scale={20} blur={1.5} />
-        <Environment preset="sunset" />
-      </Canvas>
+      <div
+        ref={el => elementsRef.current[0] = el}
+        className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-purple-50 opacity-50"
+        data-speed="0.05"
+        data-scale="0.0001"
+      ></div>
+      <div
+        ref={el => elementsRef.current[1] = el}
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-200 rounded-full opacity-20 animate-pulse"
+        data-speed="0.1"
+        data-scale="0.0002"
+      ></div>
+      <div
+        ref={el => elementsRef.current[2] = el}
+        className="absolute top-1/3 right-1/4 w-64 h-64 bg-purple-200 rounded-full opacity-20 animate-pulse animation-delay-1000"
+        data-speed="0.15"
+        data-scale="0.0003"
+      ></div>
     </div>
-  );
+  )
 }
 
 // Main Dashboard Component
@@ -190,6 +191,7 @@ export default function Dashboard() {
   const heroRef = useRef(null)
   const featuresRef = useRef(null)
   const ctaRef = useRef(null)
+  const showcaseRef = useRef(null)
 
   useEffect(() => {
     // Initialize animations when component mounts
@@ -226,16 +228,19 @@ export default function Dashboard() {
         },
       })
 
-      // Why Choose Us section parallax
-      gsap.to(".parallax-bg", {
-        scrollTrigger: {
-          trigger: ".why-choose-section",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
-        y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
-        ease: "none",
+      // Showcase section parallax
+      const showcaseElements = showcaseRef.current.querySelectorAll(".showcase-element")
+      showcaseElements.forEach((element, index) => {
+        gsap.to(element, {
+          y: (i, target) => -ScrollTrigger.maxScroll(window) * target.dataset.speed,
+          ease: "none",
+          scrollTrigger: {
+            trigger: element,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        })
       })
 
       // CTA section animation
@@ -257,16 +262,16 @@ export default function Dashboard() {
 
   return (
     <div className="relative space-y-16 pb-16 overflow-hidden">
-      {/* Floating 3D objects in the background */}
-      <FloatingObjects />
+      {/* Floating background elements */}
+      <FloatingBackground />
 
       {/* Hero Section */}
       <section
         ref={heroRef}
         className="relative text-center space-y-6 pt-16 pb-24 min-h-[700px] flex flex-col items-center justify-center"
       >
-        {/* 3D Hero Background */}
-        <HeroScene />
+        {/* Hero Background */}
+        <HeroBackground />
 
         {/* Content Overlay */}
         <div className="relative z-10 px-4">
@@ -274,7 +279,7 @@ export default function Dashboard() {
             Developer Tools, <span className="text-indigo-600">Simplified</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-            makeDEVEZY is your all-in-one platform for managing code snippets, testing APIs, handling environment
+            TechStroke is your all-in-one platform for managing code snippets, testing APIs, handling environment
             variables, and more.
           </p>
           <div className="buttons-container flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -353,7 +358,7 @@ export default function Dashboard() {
           <FeatureCard
             to="/generator"
             icon={<Box className="h-8 w-8" />}
-            title="Boilerplate Generator"
+            title="Code Collab"
             description="Generate production-ready boilerplate code for your projects with customizable templates."
             delay={0.4}
           />
@@ -383,7 +388,7 @@ export default function Dashboard() {
         <AnimatedSection className="relative z-10 max-w-6xl mx-auto px-6 md:px-8 py-20">
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-16">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-              Why Choose makeDEVEZY?
+              Why Choose TechStroke?
             </span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
@@ -405,11 +410,11 @@ export default function Dashboard() {
         </AnimatedSection>
       </section>
 
-      {/* 3D Showcase Section */}
-      <section className="relative py-20 overflow-hidden">
+      {/* Showcase Section with Parallax */}
+      <section ref={showcaseRef} className="relative py-20 overflow-hidden">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <AnimatedSection className="space-y-6">
+            <AnimatedSection className="space-y-6 showcase-element" data-speed="0.1">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
                   Powerful Developer Experience
@@ -447,28 +452,15 @@ export default function Dashboard() {
               </ul>
             </AnimatedSection>
 
-            <div className="h-[400px] relative">
-              <Canvas>
-                <ambientLight intensity={0.5} />
-                <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-                <PresentationControls
-                  global
-                  config={{ mass: 2, tension: 500 }}
-                  snap={{ mass: 4, tension: 1500 }}
-                  rotation={[0, 0, 0]}
-                  polar={[-Math.PI / 3, Math.PI / 3]}
-                  azimuth={[-Math.PI / 1.4, Math.PI / 2]}
-                >
-                  <Float rotationIntensity={0.4}>
-                    <mesh position={[0, 0, 0]} scale={1.5}>
-                      <boxGeometry args={[2, 2, 2]} />
-                      <meshStandardMaterial color="#6366f1" metalness={0.8} roughness={0.2} />
-                    </mesh>
-                  </Float>
-                </PresentationControls>
-                <ContactShadows position={[0, -1.5, 0]} opacity={0.4} scale={10} blur={1.5} />
-                <Environment preset="city" />
-              </Canvas>
+            <div className="relative h-[400px] showcase-element" data-speed="0.2">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl transform rotate-3"></div>
+              <div className="absolute inset-0 bg-white rounded-2xl shadow-xl p-8 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-24 h-24 bg-indigo-600 rounded-full mx-auto mb-6 animate-ping"></div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Interactive Demo</h3>
+                  <p className="text-gray-600">Experience the power of TechStroke firsthand</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -482,7 +474,7 @@ export default function Dashboard() {
           </span>
         </h2>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Join thousands of developers who are already using makeDEVEZY to streamline their workflow.
+          Join thousands of developers who are already using TechStroke to streamline their workflow.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
