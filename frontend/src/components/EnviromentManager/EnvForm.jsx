@@ -4,6 +4,7 @@ import React from 'react';
 import { Plus } from 'lucide-react';
 import { API_CONFIG } from '../../config/config';
 
+
 const EnvForm = ({ addEnvVariable }) => {
   const [name, setName] = useState('');
   const [value, setValue] = useState('');
@@ -17,6 +18,7 @@ const EnvForm = ({ addEnvVariable }) => {
     }
 
     try {
+
       const response = await axios.post(${API_CONFIG.BASE_URL}/api/env, { name, value });
       addEnvVariable(response.data);
       setName('');

@@ -5,6 +5,7 @@ import React from 'react';
 import { Pencil, Trash2, Save, Key } from 'lucide-react';
 import { API_CONFIG } from '../../config/config';
 
+
 const EnvItem = ({ env, updateEnvVariable, deleteEnvVariable }) => {
   const { _id, name, value } = env;
   const [isEditing, setIsEditing] = useState(false);
@@ -13,6 +14,7 @@ const EnvItem = ({ env, updateEnvVariable, deleteEnvVariable }) => {
   const handleEdit = async () => {
     try {
       const response = await axios.put(
+
         ${API_CONFIG.BASE_URL}/api/env/${env._id},
         { value: newValue }
       );
